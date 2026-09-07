@@ -1,0 +1,136 @@
+gcc -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -fno-omit-frame-pointer -fno-stack-protector -fno-pie -no-pie   -c -o peterson.o peterson.c
+ld -m    elf_i386 -N -e main -Ttext 0 -o _peterson peterson.o ulib.o usys.o printf.o umalloc.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: _peterson has a LOAD segment with RWX permissions
+objdump -S _peterson > peterson.asm
+objdump -t _peterson | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > peterson.sym
+./mkfs fs.img README _cat _echo _forktest _grep _init _kill _ln _ls _mkdir _rm _sh _stressfs _usertests _wc _zombie _peterson 
+nmeta 59 (boot, super, log blocks 30 inode blocks 26, bitmap blocks 1) blocks 941 total 1000
+balloc: first 692 blocks have been allocated
+balloc: write bitmap block at sector 58
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2 -m 512 
+SeaBIOS (version 1.17.0-debian-1.17.0-1ubuntu1)
+
+
+iPXE (https://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+1EFC8E00+1EF08E00 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk..xv6...
+cpu0: starting 0
+sb: size 1000 nblocks 941 ninodes 200 nlog 30 logstart 2 inodestart 32 bmap start 58
+init: starting sh
+$ peterson
+Process 0 in CS, counter = 1
+Process 0 in CS, counter = 2
+Process 1 in CS, counter = 3
+Process 0 in CS, counter = 4
+Process 1 in CS, counter = 5
+Process 0 in CS, counter = 6
+Process 1 in CS, counter = 7
+Process 0 in CS, counter = 8
+Process 1 in CS, counter = 9
+Process 0 in CS, counter = 10
+Process 1 in CS, counter = 11
+Process 0 in CS, counter = 12
+Process 1 in CS, counter = 13
+Process 0 in CS, counter = 14
+Process 1 in CS, counter = 15
+Process 0 in CS, counter = 16
+Process 1 in CS, counter = 17
+Process 0 in CS, counter = 18
+Process 1 in CS, counter = 19
+Process 1 in CS, counter = 20
+Final counter = 20
+$ peterson
+Process 0 in CS, counter = 1
+Process 0 in CS, counter = 2
+Process 1 in CS, counter = 3
+Process 0 in CS, counter = 4
+Process 1 in CS, counter = 5
+Process 0 in CS, counter = 6
+Process 1 in CS, counter = 7
+Process 0 in CS, counter = 8
+Process 1 in CS, counter = 9
+Process 0 in CS, counter = 10
+Process 1 in CS, counter = 11
+Process 0 in CS, counter = 12
+Process 1 in CS, counter = 13
+Process 0 in CS, counter = 14
+Process 1 in CS, counter = 15
+Process 0 in CS, counter = 16
+Process 1 in CS, counter = 17
+Process 0 in CS, counter = 18
+Process 1 in CS, counter = 19
+Process 1 in CS, counter = 20
+Final counter = 20
+$ \n\n
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2 -m 512 
+SeaBIOS (version 1.17.0-debian-1.17.0-1ubuntu1)
+
+
+iPXE (https://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+1EFC8E00+1EF08E00 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk..xv6...
+cpu0: starting 0
+sb: size 1000 nblocks 941 ninodes 200 nlog 30 logstart 2 inodestart 32 bmap start 58
+init: starting sh
+$ prodcons
+Produced: 1
+Consumed: 1
+Produced: 2
+Produced: 3
+Produced: 4
+Produced: 5
+Produced: 6
+Consumed: 2
+Produced: 7
+Consumed: 3
+Produced: 8
+Consumed: 4
+Produced: 9
+Consumed: 5
+Produced: 10
+Consumed: 6
+Produced: 11
+Consumed: 7
+Produced: 12
+Consumed: 8
+Produced: 13
+Consumed: 9
+Produced: 14
+Consumed: 10
+Produced: 15
+Consumed: 11
+Produced: 16
+Consumed: 12
+Consumed: 13
+Consumed: 14
+Consumed: 15
+Consumed: 16
+Produced: 17
+Consumed: 17
+Produced: 18
+Consumed: 18
+Produced: 19
+Consumed: 19
+Produced: 20
+Consumed: 20
+$ readwrite
+Reader 6 reads data = 0, active readers = 1
+Reader 7 reads data =Reader 8 reads data = 0, active readers = 3
+ 0, active readers = 2
+Writer 9 writes data = 1
+Writer 10 writes data = 2
+Reader 6 reads data = 2, active readers = 1
+Reader 7 reads data = 2, active readers = 2
+Reader 8 reads data = 2, active readers = 3
+Writer 9 writes data = 3
+Writer 10 writes data = 4
+Reader 6 reads data = 4, active readers = 1
+Reader 7 reads data = 4, active readers = 2
+Reader 8 reads data = 4, active readers = 3
+Writer 9 writes data = 5
+Writer 10 writes data = 6
+$ 
