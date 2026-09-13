@@ -1,0 +1,15 @@
+Deadlock Avoidance Strategy for Dining Philosophers variant (Multi-Resource):
+
+Strategy Used: Deadlock Prevention via Strict Resource Ordering (Hierarchical Allocation)
+
+Why it prevents deadlock:
+In this scenario, there are 5 processes that need a combination of Scanners, Printers, and Disks. Because there are limited instances of each (1 Scanner, 2 Printers, 2 Disks) and processes need 2 out of 3, deadlocks (circular waits) could easily form if processes acquire them in arbitrary orders.
+
+To prevent this, I assigned a strict global hierarchy/order to the resources:
+1. Scanner (Highest priority to acquire first)
+2. Printer
+3. Disk (Lowest priority to acquire last)
+
+Every process is required to request its needed resources in this exact order. For instance, a process needing a Printer and a Disk will always ask for the Printer first, then the Disk. A process needing a Scanner and a Printer will ask for the Scanner first.
+
+Because all processes respect this global ordering, a cycle in the resource allocation graph can never occur. A process holding a lower-numbered resource will only ever request a higher-numbered resource, meaning it can never wait on a process that holds a higher-numbered resource but needs a lower-numbered one (since that process would have had to request the lower-numbered resource first). By breaking the "Circular Wait" condition, the system is fundamentally protected from deadlocks.

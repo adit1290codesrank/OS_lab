@@ -1,0 +1,6 @@
+========== RUNNING deadlockdetect ==========
+--- Scenario 1: No Deadlock ---
+No deadlock detected.
+
+--- Scenario 2: Deadlock (3 processes) ---
+Deadlock detected! Cycle: P0 -> P1 -> P2 -> P0

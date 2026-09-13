@@ -1,0 +1,28 @@
+========== RUNNING syncdeadlock ==========
+Starting syncdeadlock with Resource Ordering prevention...
+Process 0: Requesting Scanner
+Process 0: Granted Scanner
+Process 0: Requesting Printer
+Process 0: Granted Printer
+Process 1: Requesting Printer
+Process 1: Granted Printer
+Process 1: Requesting Disk
+Process 1: Granted Disk
+Process 0: Started work with Scanner and Printer.
+Process 1: Started work with Printer and Disk.
+Process 2: Requesting Scanner
+Process 3: Requesting Printer
+Process 4: Requesting Scanner
+...
+Process 0: Releasing Printer
+Process 0: Releasing Scanner
+Process 1: Releasing Disk
+Process 1: Releasing Printer
+Process 2: Granted Scanner
+Process 2: Requesting Disk
+Process 2: Granted Disk
+Process 2: Started work with Scanner and Disk.
+Process 3: Granted Printer
+Process 3: Requesting Disk
+...
+All processes completed successfully (no deadlock).

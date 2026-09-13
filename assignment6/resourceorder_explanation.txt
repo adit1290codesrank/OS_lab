@@ -1,0 +1,7 @@
+Explanation of Deadlock Prevention via Resource Ordering:
+
+Consistent resource ordering prevents deadlocks by directly breaking the "Circular Wait" condition, which is one of the four necessary Coffman conditions for a deadlock to occur.
+
+In a system where processes can acquire multiple resources, a cycle is formed when Process A holds Resource 1 and waits for Resource 2, while Process B holds Resource 2 and waits for Resource 1. 
+
+By enforcing a strict, global order in which all resources must be acquired (e.g., Lock 1 must always be acquired before Lock 2), we guarantee that a circular wait is mathematically impossible. If Process A has Lock 1 and needs Lock 2, it can proceed or wait for Lock 2. Process B, which might need both locks, is forced to wait for Lock 1 before it can even attempt to acquire Lock 2. Thus, Process B will never hold Lock 2 while waiting for Lock 1, and no circular dependencies can form. The graph of dependencies is guaranteed to be acyclic.
