@@ -1,0 +1,245 @@
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2,sockets=2 -m 512 
+SeaBIOS (version 1.17.0-debian-1.17.0-1ubuntu1)
+
+
+
+iPXE (https://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+1EFC8E00+1EF08E00 CA00
+
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...
+                                                                               
+
+
+
+Booting from Hard Disk..xv6...
+cpu1: starting 1
+cpu0: starting 0
+sb: size 1000 nblocks 941 ninodes 200 nlog 30 logstart 2 inodestart 32 bmap start 58
+init: starting sh
+$ threadtest
+threadtest: parent pid 3, 3 threads x 100000 increments, no synchronization
+created thread 0 (pid 4)
+created thread 1 (pid 5)
+created thread 2 (pid 6)
+joined thread pid 4
+joined thread pid 5
+joined thread pid 6
+final counter = 271794 (expected 300000)
+race condition: lost 28206 updates
+$ threadtest
+threadtest: parent pid 7, 3 threads x 100000 increments, no synchronization
+created thread 0 (pid 8)
+created thread 1 (pid 9)
+created thread 2 (pid 10)
+joined thread pid 10
+joined thread pid 8
+joined thread pid 9
+final counter = 211379 (expected 300000)
+race condition: lost 88621 updates
+$ threadtest
+threadtest: parent pid 11, 3 threads x 100000 increments, no synchronization
+created thread 0 (pid 12)
+created thread 1 (pid 13)
+created thread 2 (pid 14)
+joined thread pid 12
+joined thread pid 13
+joined thread pid 14
+final counter = 223534 (expected 300000)
+race condition: lost 76466 updates
+$ synctest
+synctest part 1: 3 threads x 100000 increments, guarded by semaphore
+final counter = 300000 (expected 300000) -> CORRECT
+
+synctest part 2: producer-consumer, buffer size 5, 20 items
+producer: produced 1  [buffer count=1]
+consumer: consumed 1  [buffer count=0]
+producer: produced 2  [buffer count=1]
+consumer: consumed 2  [buffer count=0]
+producer: produced 3  [buffer count=1]
+consumer: consumed 3  [buffer count=0]
+producer: produced 4  [buffer count=1]
+consumer: consumed 4  [buffer count=0]
+producer: produced 5  [buffer count=1]
+producer: produced 6  [buffer count=2]
+consumer: consumed 5  [buffer count=1]
+producer: produced 7  [buffer count=2]
+consumer: consumed 6  [buffer count=1]
+producer: produced 8  [buffer count=2]
+consumer: consumed 7  [buffer count=1]
+producer: produced 9  [buffer count=2]
+consumer: consumed 8  [buffer count=1]
+producer: produced 10  [buffer count=2]
+consumer: consumed 9  [buffer count=1]
+producer: produced 11  [buffer count=2]
+consumer: consumed 10  [buffer count=1]
+producer: produced 12  [buffer count=2]
+consumer: consumed 11  [buffer count=1]
+producer: produced 13  [buffer count=2]
+consumer: consumed 12  [buffer count=1]
+producer: produced 14  [buffer count=2]
+consumer: consumed 13  [buffer count=1]
+producer: produced 15  [buffer count=2]
+consumer: consumed 14  [buffer count=1]
+producer: produced 16  [buffer count=2]
+consumer: consumed 15  [buffer count=1]
+producer: produced 17  [buffer count=2]
+consumer: consumed 16  [buffer count=1]
+producer: produced 18  [buffer count=2]
+consumer: consumed 17  [buffer count=1]
+producer: produced 19  [buffer count=2]
+consumer: consumed 18  [buffer count=1]
+producer: produced 20  [buffer count=2]
+consumer: consumed 19  [buffer count=1]
+consumer: consumed 20  [buffer count=0]
+producer-consumer done: final count=0, overflow=no, underflow=no
+$ deadlock
+
+==== Test 1: detection, expected NO deadlock ====
+Available: 0 0 0
+Allocation:
+  P0: 0 1 0
+  P1: 2 0 0
+  P2: 3 0 3
+  P3: 2 1 1
+  P4: 0 0 2
+Request:
+  P0: 0 0 0
+  P1: 2 0 2
+  P2: 0 0 0
+  P3: 1 0 0
+  P4: 0 0 2
+Running detection algorithm:
+  P0 request satisfiable -> finishes, Work = 0 1 0
+  P2 request satisfiable -> finishes, Work = 3 1 3
+  P3 request satisfiable -> finishes, Work = 5 2 4
+  P4 request satisfiable -> finishes, Work = 5 2 6
+  P1 request satisfiable -> finishes, Work = 7 2 6
+RESULT: no deadlock
+
+==== Test 2: detection, P2 asks for one more C, expected DEADLOCK ====
+Available: 0 0 0
+Allocation:
+  P0: 0 1 0
+  P1: 2 0 0
+  P2: 3 0 3
+  P3: 2 1 1
+  P4: 0 0 2
+Request:
+  P0: 0 0 0
+  P1: 2 0 2
+  P2: 0 0 1
+  P3: 1 0 0
+  P4: 0 0 2
+Running detection algorithm:
+  P0 request satisfiable -> finishes, Work = 0 1 0
+RESULT: DEADLOCK among P1 P2 P3 P4
+
+==== Test 3: Banker's algorithm, safe state ====
+Available: 3 3 2
+Allocation:
+  P0: 0 1 0
+  P1: 2 0 0
+  P2: 3 0 2
+  P3: 2 1 1
+  P4: 0 0 2
+Max:
+  P0: 7 5 3
+  P1: 3 2 2
+  P2: 9 0 2
+  P3: 2 2 2
+  P4: 4 3 3
+Need:
+  P0: 7 4 3
+  P1: 1 2 2
+  P2: 6 0 0
+  P3: 0 1 1
+  P4: 4 3 1
+  SAFE: safe sequence < P1 P3 P4 P0 P2 >
+
+P1 requests 1 0 2
+  pretend-allocated, state would be:
+Available: 2 3 0
+Allocation:
+  P0: 0 1 0
+  P1: 3 0 2
+  P2: 3 0 2
+  P3: 2 1 1
+  P4: 0 0 2
+Max:
+  P0: 7 5 3
+  P1: 3 2 2
+  P2: 9 0 2
+  P3: 2 2 2
+  P4: 4 3 3
+Need:
+  P0: 7 4 3
+  P1: 0 2 0
+  P2: 6 0 0
+  P3: 0 1 1
+  P4: 4 3 1
+  SAFE: safe sequence < P1 P3 P4 P0 P2 >
+  -> request GRANTED
+
+==== Test 4: Banker's algorithm, request that makes state unsafe ====
+
+P0 requests 0 2 0
+  pretend-allocated, state would be:
+Available: 2 1 0
+Allocation:
+  P0: 0 3 0
+  P1: 3 0 2
+  P2: 3 0 2
+  P3: 2 1 1
+  P4: 0 0 2
+Max:
+  P0: 7 5 3
+  P1: 3 2 2
+  P2: 9 0 2
+  P3: 2 2 2
+  P4: 4 3 3
+Need:
+  P0: 7 2 3
+  P1: 0 2 0
+  P2: 6 0 0
+  P3: 0 1 1
+  P4: 4 3 1
+  UNSAFE: no safe sequence exists (only 0 of 5 can finish)
+  -> request DENIED (would lead to unsafe state), rolled back
+
+==== Test 5: real deadlock with xv6 processes and pipes ====
+  A (pid 22): holds Pipe1 write end, waiting to read Pipe2
+  B (pid 23): holds Pipe2 write end, waiting to read Pipe1
+  after 100 ticks neither A nor B has made progress
+Resources: R0=Pipe1 (write end), R1=Pipe2 (write end)
+Available: 0 0
+Allocation:
+  A: 1 0
+  B: 0 1
+Request:
+  A: 0 1
+  B: 1 0
+Running detection algorithm:
+RESULT: DEADLOCK (circular wait) among A B
+  killed pids 22 and 23 to break the deadlock
+$ priotest
+priotest: forking 4 CPU-bound children, aging every 30 waiting ticks
+  child pid 25 -> priority 2
+  child pid 26 -> priority 6
+  child pid 27 -> priority 12
+  child pid 28 -> priority 20
+  [monitor] pid 28 (start prio 20): priority 20 -> 19 at tick 33 (waited 33 ticks)
+  [monitor] pid 28 (start prio 20): priority 19 -> 18 at tick 65 (waited 32 ticks)
+  [monitor] pid 28 (start prio 20): priority 18 -> 17 at tick 95 (waited 30 ticks)
+  [monitor] pid 28 (start prio 20): priority 17 -> 16 at tick 127 (waited 32 ticks)
+  pid 25 (start prio 2) FINISHED at tick 144, final prio 2
+  pid 26 (start prio 6) FINISHED at tick 155, final prio 6
+  pid 27 (start prio 12) FINISHED at tick 286, final prio 8
+  pid 28 (start prio 20) FINISHED at tick 305, final prio 16
+
+Completion order:
+  rank	pid	priority	completion(ticks)
+  1	25	2		144
+  2	26	6		156
+  3	27	12		287
+  4	28	20		305
+$ QEMU: Terminated
+

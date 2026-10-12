@@ -1,0 +1,52 @@
+$ make qemu-nox   (CPUS=2)
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2,sockets=2 -m 512 
+...
+cpu1: starting 1
+cpu0: starting 0
+...
+$ synctest
+synctest part 1: 3 threads x 100000 increments, guarded by semaphore
+final counter = 300000 (expected 300000) -> CORRECT
+
+synctest part 2: producer-consumer, buffer size 5, 20 items
+producer: produced 1  [buffer count=1]
+consumer: consumed 1  [buffer count=0]
+producer: produced 2  [buffer count=1]
+consumer: consumed 2  [buffer count=0]
+producer: produced 3  [buffer count=1]
+consumer: consumed 3  [buffer count=0]
+producer: produced 4  [buffer count=1]
+consumer: consumed 4  [buffer count=0]
+producer: produced 5  [buffer count=1]
+producer: produced 6  [buffer count=2]
+consumer: consumed 5  [buffer count=1]
+producer: produced 7  [buffer count=2]
+consumer: consumed 6  [buffer count=1]
+producer: produced 8  [buffer count=2]
+consumer: consumed 7  [buffer count=1]
+producer: produced 9  [buffer count=2]
+consumer: consumed 8  [buffer count=1]
+producer: produced 10  [buffer count=2]
+consumer: consumed 9  [buffer count=1]
+producer: produced 11  [buffer count=2]
+consumer: consumed 10  [buffer count=1]
+producer: produced 12  [buffer count=2]
+consumer: consumed 11  [buffer count=1]
+producer: produced 13  [buffer count=2]
+consumer: consumed 12  [buffer count=1]
+producer: produced 14  [buffer count=2]
+consumer: consumed 13  [buffer count=1]
+producer: produced 15  [buffer count=2]
+consumer: consumed 14  [buffer count=1]
+producer: produced 16  [buffer count=2]
+consumer: consumed 15  [buffer count=1]
+producer: produced 17  [buffer count=2]
+consumer: consumed 16  [buffer count=1]
+producer: produced 18  [buffer count=2]
+consumer: consumed 17  [buffer count=1]
+producer: produced 19  [buffer count=2]
+consumer: consumed 18  [buffer count=1]
+producer: produced 20  [buffer count=2]
+consumer: consumed 19  [buffer count=1]
+consumer: consumed 20  [buffer count=0]
+producer-consumer done: final count=0, overflow=no, underflow=no

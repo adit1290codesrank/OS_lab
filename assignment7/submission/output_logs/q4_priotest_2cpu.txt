@@ -1,0 +1,28 @@
+$ make qemu-nox   (CPUS=2)
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2,sockets=2 -m 512 
+...
+cpu1: starting 1
+cpu0: starting 0
+...
+$ priotest
+priotest: forking 4 CPU-bound children, aging every 30 waiting ticks
+  child pid 25 -> priority 2
+  child pid 26 -> priority 6
+  child pid 27 -> priority 12
+  child pid 28 -> priority 20
+  [monitor] pid 28 (start prio 20): priority 20 -> 19 at tick 33 (waited 33 ticks)
+  [monitor] pid 28 (start prio 20): priority 19 -> 18 at tick 65 (waited 32 ticks)
+  [monitor] pid 28 (start prio 20): priority 18 -> 17 at tick 95 (waited 30 ticks)
+  [monitor] pid 28 (start prio 20): priority 17 -> 16 at tick 127 (waited 32 ticks)
+  pid 25 (start prio 2) FINISHED at tick 144, final prio 2
+  pid 26 (start prio 6) FINISHED at tick 155, final prio 6
+  pid 27 (start prio 12) FINISHED at tick 286, final prio 8
+  pid 28 (start prio 20) FINISHED at tick 305, final prio 16
+
+Completion order:
+  rank	pid	priority	completion(ticks)
+  1	25	2		144
+  2	26	6		156
+  3	27	12		287
+  4	28	20		305
+$

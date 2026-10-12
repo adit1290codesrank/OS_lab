@@ -1,0 +1,49 @@
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 1,sockets=1 -m 512 
+SeaBIOS (version 1.17.0-debian-1.17.0-1ubuntu1)
+
+
+
+iPXE (https://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+1EFC8E00+1EF08E00 CA00
+
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...
+                                                                               
+
+
+
+Booting from Hard Disk..xv6...
+cpu0: starting 0
+sb: size 1000 nblocks 941 ninodes 200 nlog 30 logstart 2 inodestart 32 bmap start 58
+init: starting sh
+$ priotest
+priotest: forking 4 CPU-bound children, aging every 30 waiting ticks
+  child pid 4 -> priority 2
+  child pid 5 -> priority 6
+  child pid 6 -> priority 12
+  child pid 7 -> priority 20
+  [monitor] pid 7 (start prio 20): priority 20 -> 19 at tick 34 (waited 34 ticks)
+  [monitor] pid 7 (start prio 20): priority 19 -> 18 at tick 64 (waited 30 ticks)
+  [monitor] pid 7 (start prio 20): priority 18 -> 17 at tick 96 (waited 32 ticks)
+  [monitor] pid 7 (start prio 20): priority 17 -> 16 at tick 126 (waited 30 ticks)
+  pid 4 (start prio 2) FINISHED at tick 146, final prio 2
+  [monitor] pid 7 (start prio 20): priority 16 -> 15 at tick 158 (waited 32 ticks)
+  [monitor] pid 7 (start prio 20): priority 15 -> 14 at tick 188 (waited 30 ticks)
+  [monitor] pid 7 (start prio 20): priority 14 -> 13 at tick 220 (waited 32 ticks)
+  [monitor] pid 7 (start prio 20): priority 13 -> 12 at tick 250 (waited 30 ticks)
+  [monitor] pid 7 (start prio 20): priority 12 -> 11 at tick 282 (waited 32 ticks)
+  pid 5 (start prio 6) FINISHED at tick 292, final prio 2
+  [monitor] pid 7 (start prio 20): priority 11 -> 10 at tick 312 (waited 30 ticks)
+  [monitor] pid 7 (start prio 20): priority 10 -> 9 at tick 344 (waited 32 ticks)
+  [monitor] pid 7 (start prio 20): priority 9 -> 8 at tick 374 (waited 30 ticks)
+  [monitor] pid 7 (start prio 20): priority 8 -> 7 at tick 406 (waited 32 ticks)
+  [monitor] pid 7 (start prio 20): priority 7 -> 6 at tick 436 (waited 30 ticks)
+  pid 6 (start prio 12) FINISHED at tick 438, final prio 3
+  pid 7 (start prio 20) FINISHED at tick 580, final prio 6
+
+Completion order:
+  rank	pid	priority	completion(ticks)
+  1	4	2		147
+  2	5	6		293
+  3	6	12		439
+  4	7	20		581
+$ QEMU: Terminated
+

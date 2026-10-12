@@ -1,0 +1,135 @@
+$ make qemu-nox   (CPUS=2)
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2,sockets=2 -m 512 
+...
+cpu1: starting 1
+cpu0: starting 0
+...
+$ deadlock
+
+==== Test 1: detection, expected NO deadlock ====
+Available: 0 0 0
+Allocation:
+  P0: 0 1 0
+  P1: 2 0 0
+  P2: 3 0 3
+  P3: 2 1 1
+  P4: 0 0 2
+Request:
+  P0: 0 0 0
+  P1: 2 0 2
+  P2: 0 0 0
+  P3: 1 0 0
+  P4: 0 0 2
+Running detection algorithm:
+  P0 request satisfiable -> finishes, Work = 0 1 0
+  P2 request satisfiable -> finishes, Work = 3 1 3
+  P3 request satisfiable -> finishes, Work = 5 2 4
+  P4 request satisfiable -> finishes, Work = 5 2 6
+  P1 request satisfiable -> finishes, Work = 7 2 6
+RESULT: no deadlock
+
+==== Test 2: detection, P2 asks for one more C, expected DEADLOCK ====
+Available: 0 0 0
+Allocation:
+  P0: 0 1 0
+  P1: 2 0 0
+  P2: 3 0 3
+  P3: 2 1 1
+  P4: 0 0 2
+Request:
+  P0: 0 0 0
+  P1: 2 0 2
+  P2: 0 0 1
+  P3: 1 0 0
+  P4: 0 0 2
+Running detection algorithm:
+  P0 request satisfiable -> finishes, Work = 0 1 0
+RESULT: DEADLOCK among P1 P2 P3 P4
+
+==== Test 3: Banker's algorithm, safe state ====
+Available: 3 3 2
+Allocation:
+  P0: 0 1 0
+  P1: 2 0 0
+  P2: 3 0 2
+  P3: 2 1 1
+  P4: 0 0 2
+Max:
+  P0: 7 5 3
+  P1: 3 2 2
+  P2: 9 0 2
+  P3: 2 2 2
+  P4: 4 3 3
+Need:
+  P0: 7 4 3
+  P1: 1 2 2
+  P2: 6 0 0
+  P3: 0 1 1
+  P4: 4 3 1
+  SAFE: safe sequence < P1 P3 P4 P0 P2 >
+
+P1 requests 1 0 2
+  pretend-allocated, state would be:
+Available: 2 3 0
+Allocation:
+  P0: 0 1 0
+  P1: 3 0 2
+  P2: 3 0 2
+  P3: 2 1 1
+  P4: 0 0 2
+Max:
+  P0: 7 5 3
+  P1: 3 2 2
+  P2: 9 0 2
+  P3: 2 2 2
+  P4: 4 3 3
+Need:
+  P0: 7 4 3
+  P1: 0 2 0
+  P2: 6 0 0
+  P3: 0 1 1
+  P4: 4 3 1
+  SAFE: safe sequence < P1 P3 P4 P0 P2 >
+  -> request GRANTED
+
+==== Test 4: Banker's algorithm, request that makes state unsafe ====
+
+P0 requests 0 2 0
+  pretend-allocated, state would be:
+Available: 2 1 0
+Allocation:
+  P0: 0 3 0
+  P1: 3 0 2
+  P2: 3 0 2
+  P3: 2 1 1
+  P4: 0 0 2
+Max:
+  P0: 7 5 3
+  P1: 3 2 2
+  P2: 9 0 2
+  P3: 2 2 2
+  P4: 4 3 3
+Need:
+  P0: 7 2 3
+  P1: 0 2 0
+  P2: 6 0 0
+  P3: 0 1 1
+  P4: 4 3 1
+  UNSAFE: no safe sequence exists (only 0 of 5 can finish)
+  -> request DENIED (would lead to unsafe state), rolled back
+
+==== Test 5: real deadlock with xv6 processes and pipes ====
+  A (pid 22): holds Pipe1 write end, waiting to read Pipe2
+  B (pid 23): holds Pipe2 write end, waiting to read Pipe1
+  after 100 ticks neither A nor B has made progress
+Resources: R0=Pipe1 (write end), R1=Pipe2 (write end)
+Available: 0 0
+Allocation:
+  A: 1 0
+  B: 0 1
+Request:
+  A: 0 1
+  B: 1 0
+Running detection algorithm:
+RESULT: DEADLOCK (circular wait) among A B
+  killed pids 22 and 23 to break the deadlock
