@@ -1,0 +1,12 @@
+$ make qemu-nox CPUS=1
+...
+$ memtest
+start              : total=57065 free=56789 proc=3 pt=66
+after sbrk(16 pages): total=57065 free=56773 proc=19 pt=66
+  free pages dropped by 16
+in child            : total=57065 free=56687 proc=19 pt=66
+  child costs 86 pages (user copy + page tables + kstack)
+after child reaped  : total=57065 free=56773 proc=19 pt=66
+  before fork 56773, after wait 56773 -> no leak
+after sbrk(-16 pages): total=57065 free=56789 proc=3 pt=66
+  start 56789, after shrink 56789 -> back to original

@@ -1,0 +1,141 @@
+$ make qemu-nox   (CPUS=2)
+qemu-system-i386 -nographic -drive file=fs.img,index=1,media=disk,format=raw -drive file=xv6.img,index=0,media=disk,format=raw -smp 2,sockets=2 -m 512 
+cSeaBIOS (version 1.17.0-debian-1.17.0-1ubuntu1)
+
+
+
+iPXE (https://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+1EFC8E00+1EF08E00 CA00
+
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...
+                                                                               
+
+
+
+xv6...
+cpu1: starting 1
+cpu0: starting 0
+sb: size 1000 nblocks 941 ninodes 200 nlog 30 logstart 2 inodestart 32 bmap start 58
+init: starting sh
+$ vatest
+=== Q1(c): VA -> PA of different variables ===
+[kernel] va2pa: va 0xd78 pdx 0 ptx 0 off 0xd78 -> pa 0xdee8d78 flags P=1 W=1 U=1
+global: va 0xD78 -> pa 0xDEE8D78
+
+[kernel] va2pa: va 0x2fcc pdx 0 ptx 2 off 0xfcc -> pa 0xdee5fcc flags P=1 W=1 U=1
+local : va 0x2FCC -> pa 0xDEE5FCC
+
+[kernel] va2pa: va 0xaf98 pdx 0 ptx 10 off 0xf98 -> pa 0xdf76f98 flags P=1 W=1 U=1
+malloc: va 0xAF98 -> pa 0xDF76F98
+
+[kernel] va2pa: va 0x7fffffff pdx 511 ptx 1023 off 0xfff -> not mapped / not user
+unmapped 0x7FFFFFFF: va2pa returned -1
+
+[kernel] va2pa: va 0x80100000 pdx 512 ptx 256 off 0x0 -> not mapped / not user
+kernel   0x80100000: va2pa returned -1
+
+=== Q1(d): same VA after fork ===
+[kernel] va2pa: va 0xd78 pdx 0 ptx 0 off 0xd78 -> pa 0xdf2cd78 flags P=1 W=1 U=1
+child : &global = 0xD78 pa = 0xDF2CD78 global = 100
+
+[kernel] va2pa: va 0xd78 pdx 0 ptx 0 off 0xd78 -> pa 0xdee8d78 flags P=1 W=1 U=1
+parent: &global = 0xD78 pa = 0xDEE8D78 global = 100
+same virtual address, different physical frames (fork copies pages)
+$ memtest
+start              : total=57065 free=56788 proc=3 pt=66
+after sbrk(16 pages): total=57065 free=56772 proc=19 pt=66
+  free pages dropped by 16
+in child            : total=57065 free=56686 proc=19 pt=66
+  child costs 86 pages (user copy + page tables + kstack)
+after child reaped  : total=57065 free=56772 proc=19 pt=66
+  before fork 56772, after wait 56772 -> no leak
+after sbrk(-16 pages): total=57065 free=56788 proc=3 pt=66
+  start 56788, after shrink 56788 -> back to original
+$ vmprinttest
+=== vmprint at start-up (sz = 0x3000) ===
+page directory at pa 0xdf1e000
+  pde 0: pt pa 0xdf0d000 flags PWU
+    pte 0: va 0x0 -> pa 0xdf0c000 flags PWU
+    pte 1: va 0x1000 -> pa 0xdf0e000 flags PW-  <-- guard page
+    pte 2: va 0x2000 -> pa 0xdf0f000 flags PWU
+  kernel: 64 page directory entries at or above KERNBASE (not shown)
+  summary: sz/PGSIZE = 3, user pages = 2, guard pages = 1 -> match
+
+=== vmprint after sbrk(8 * 4096) (sz = 0xB000) ===
+page directory at pa 0xdf1e000
+  pde 0: pt pa 0xdf0d000 flags PWU
+    pte 0: va 0x0 -> pa 0xdf0c000 flags PWU
+    pte 1: va 0x1000 -> pa 0xdf0e000 flags PW-  <-- guard page
+    pte 2: va 0x2000 -> pa 0xdf0f000 flags PWU
+    pte 3: va 0x3000 -> pa 0xdf2d000 flags PWU
+    pte 4: va 0x4000 -> pa 0xdee4000 flags PWU
+    pte 5: va 0x5000 -> pa 0xdf2a000 flags PWU
+    pte 6: va 0x6000 -> pa 0xdf75000 flags PWU
+    pte 7: va 0x7000 -> pa 0xdffd000 flags PWU
+    pte 8: va 0x8000 -> pa 0xdffc000 flags PWU
+    pte 9: va 0x9000 -> pa 0xdffb000 flags PWU
+    pte 10: va 0xa000 -> pa 0xdffa000 flags PWU
+  kernel: 64 page directory entries at or above KERNBASE (not shown)
+  summary: sz/PGSIZE = 11, user pages = 10, guard pages = 1 -> match
+
+=== vmprint after sbrk(-4096) (sz = 0xA000) ===
+page directory at pa 0xdf1e000
+  pde 0: pt pa 0xdf0d000 flags PWU
+    pte 0: va 0x0 -> pa 0xdf0c000 flags PWU
+    pte 1: va 0x1000 -> pa 0xdf0e000 flags PW-  <-- guard page
+    pte 2: va 0x2000 -> pa 0xdf0f000 flags PWU
+    pte 3: va 0x3000 -> pa 0xdf2d000 flags PWU
+    pte 4: va 0x4000 -> pa 0xdee4000 flags PWU
+    pte 5: va 0x5000 -> pa 0xdf2a000 flags PWU
+    pte 6: va 0x6000 -> pa 0xdf75000 flags PWU
+    pte 7: va 0x7000 -> pa 0xdffd000 flags PWU
+    pte 8: va 0x8000 -> pa 0xdffc000 flags PWU
+    pte 9: va 0x9000 -> pa 0xdffb000 flags PWU
+  kernel: 64 page directory entries at or above KERNBASE (not shown)
+  summary: sz/PGSIZE = 10, user pages = 9, guard pages = 1 -> match
+$ lazytest
+=== Q4(d): sbrk(32 MB) without touching ===
+before sbrk: free=56787 proc=4 pt=66
+after sbrk : free=56787 proc=8196 pt=66
+sbrk returned 0x4000, frames used by 32 MB sbrk: 0
+
+=== touching 4 widely spaced pages ===
+after touch: free=56780 proc=8196 pt=69
+frames used by touching 4 pages: 7 (4 data + page tables)
+
+=== system calls with untouched buffers ===
+read() into untouched page returned 30: "NOTE: we have stopped maintain"
+write() from untouched page returned 16
+read() back 16 bytes, first byte = 0
+frames faulted in by the kernel: 6
+
+=== fork + exit with a lazy heap ===
+child sees touched pages: A B C D
+child      : free=56688 proc=8196 pt=73
+parent after wait: free=56774 proc=8196 pt=72
+free before fork 56774, after wait 56774 -> no leak
+
+=== invalid accesses ===
+-- child touches address beyond sz (0x2007000) --
+pid 10 lazytest: page fault at 0x2007000 is beyond sz 0x2004000
+pid 10 lazytest: trap 14 err 6 on cpu 1 eip 0x512 addr 0x2007000--kill proc
+child killed, parent still alive
+
+-- child touches stack guard page (0x2000) --
+pid 11 lazytest: page fault at 0x2000 is below the heap (code/data/guard/stack)
+pid 11 lazytest: trap 14 err 7 on cpu 1 eip 0x512 addr 0x2000--kill proc
+child killed, parent still alive
+
+-- child touches kernel address (0x80100000) --
+pid 12 lazytest: page fault at 0x80100000 is beyond sz 0x2004000
+pid 12 lazytest: trap 14 err 7 on cpu 1 eip 0x512 addr 0x80100000--kill proc
+child killed, parent still alive
+
+-- child sbrk's 400 MB and touches every page (out of memory) --
+pid 13 lazytest: out of memory at 0xfd3f000
+pid 13 lazytest: trap 14 err 6 on cpu 0 eip 0x3a8 addr 0xfd3f000--kill proc
+child killed, parent alive. free before 56774, after 56774 -> no leak
+
+=== shrinking the lazy heap ===
+after sbrk(-32 MB): free=56781 proc=4 pt=72
+free at start 56787, now 56781 (page tables are kept until exit)
+$

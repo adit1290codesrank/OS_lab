@@ -1,0 +1,44 @@
+$ make qemu-nox CPUS=1
+...
+$ vmprinttest
+=== vmprint at start-up (sz = 0x3000) ===
+page directory at pa 0xdf1e000
+  pde 0: pt pa 0xdf0d000 flags PWU
+    pte 0: va 0x0 -> pa 0xdf0c000 flags PWU
+    pte 1: va 0x1000 -> pa 0xdf0e000 flags PW-  <-- guard page
+    pte 2: va 0x2000 -> pa 0xdf0f000 flags PWU
+  kernel: 64 page directory entries at or above KERNBASE (not shown)
+  summary: sz/PGSIZE = 3, user pages = 2, guard pages = 1 -> match
+
+=== vmprint after sbrk(8 * 4096) (sz = 0xB000) ===
+page directory at pa 0xdf1e000
+  pde 0: pt pa 0xdf0d000 flags PWU
+    pte 0: va 0x0 -> pa 0xdf0c000 flags PWU
+    pte 1: va 0x1000 -> pa 0xdf0e000 flags PW-  <-- guard page
+    pte 2: va 0x2000 -> pa 0xdf0f000 flags PWU
+    pte 3: va 0x3000 -> pa 0xdf2d000 flags PWU
+    pte 4: va 0x4000 -> pa 0xdee4000 flags PWU
+    pte 5: va 0x5000 -> pa 0xdf2a000 flags PWU
+    pte 6: va 0x6000 -> pa 0xdf75000 flags PWU
+    pte 7: va 0x7000 -> pa 0xdffd000 flags PWU
+    pte 8: va 0x8000 -> pa 0xdffc000 flags PWU
+    pte 9: va 0x9000 -> pa 0xdffb000 flags PWU
+    pte 10: va 0xa000 -> pa 0xdffa000 flags PWU
+  kernel: 64 page directory entries at or above KERNBASE (not shown)
+  summary: sz/PGSIZE = 11, user pages = 10, guard pages = 1 -> match
+
+=== vmprint after sbrk(-4096) (sz = 0xA000) ===
+page directory at pa 0xdf1e000
+  pde 0: pt pa 0xdf0d000 flags PWU
+    pte 0: va 0x0 -> pa 0xdf0c000 flags PWU
+    pte 1: va 0x1000 -> pa 0xdf0e000 flags PW-  <-- guard page
+    pte 2: va 0x2000 -> pa 0xdf0f000 flags PWU
+    pte 3: va 0x3000 -> pa 0xdf2d000 flags PWU
+    pte 4: va 0x4000 -> pa 0xdee4000 flags PWU
+    pte 5: va 0x5000 -> pa 0xdf2a000 flags PWU
+    pte 6: va 0x6000 -> pa 0xdf75000 flags PWU
+    pte 7: va 0x7000 -> pa 0xdffd000 flags PWU
+    pte 8: va 0x8000 -> pa 0xdffc000 flags PWU
+    pte 9: va 0x9000 -> pa 0xdffb000 flags PWU
+  kernel: 64 page directory entries at or above KERNBASE (not shown)
+  summary: sz/PGSIZE = 10, user pages = 9, guard pages = 1 -> match

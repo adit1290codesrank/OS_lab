@@ -1,0 +1,26 @@
+$ make qemu-nox CPUS=1
+...
+$ vatest
+=== Q1(c): VA -> PA of different variables ===
+[kernel] va2pa: va 0xd78 pdx 0 ptx 0 off 0xd78 -> pa 0xdee8d78 flags P=1 W=1 U=1
+global: va 0xD78 -> pa 0xDEE8D78
+
+[kernel] va2pa: va 0x2fcc pdx 0 ptx 2 off 0xfcc -> pa 0xdee5fcc flags P=1 W=1 U=1
+local : va 0x2FCC -> pa 0xDEE5FCC
+
+[kernel] va2pa: va 0xaf98 pdx 0 ptx 10 off 0xf98 -> pa 0xdf76f98 flags P=1 W=1 U=1
+malloc: va 0xAF98 -> pa 0xDF76F98
+
+[kernel] va2pa: va 0x7fffffff pdx 511 ptx 1023 off 0xfff -> not mapped / not user
+unmapped 0x7FFFFFFF: va2pa returned -1
+
+[kernel] va2pa: va 0x80100000 pdx 512 ptx 256 off 0x0 -> not mapped / not user
+kernel   0x80100000: va2pa returned -1
+
+=== Q1(d): same VA after fork ===
+[kernel] va2pa: va 0xd78 pdx 0 ptx 0 off 0xd78 -> pa 0xdf2cd78 flags P=1 W=1 U=1
+child : &global = 0xD78 pa = 0xDF2CD78 global = 100
+
+[kernel] va2pa: va 0xd78 pdx 0 ptx 0 off 0xd78 -> pa 0xdee8d78 flags P=1 W=1 U=1
+parent: &global = 0xD78 pa = 0xDEE8D78 global = 100
+same virtual address, different physical frames (fork copies pages)

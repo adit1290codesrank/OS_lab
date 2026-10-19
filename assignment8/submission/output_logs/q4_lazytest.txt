@@ -1,0 +1,48 @@
+$ make qemu-nox CPUS=1
+...
+$ lazytest
+=== Q4(d): sbrk(32 MB) without touching ===
+before sbrk: free=56788 proc=4 pt=66
+after sbrk : free=56788 proc=8196 pt=66
+sbrk returned 0x4000, frames used by 32 MB sbrk: 0
+
+=== touching 4 widely spaced pages ===
+after touch: free=56781 proc=8196 pt=69
+frames used by touching 4 pages: 7 (4 data + page tables)
+
+=== system calls with untouched buffers ===
+read() into untouched page returned 30: "NOTE: we have stopped maintain"
+write() from untouched page returned 16
+read() back 16 bytes, first byte = 0
+frames faulted in by the kernel: 6
+
+=== fork + exit with a lazy heap ===
+child sees touched pages: A B C D
+child      : free=56689 proc=8196 pt=73
+parent after wait: free=56775 proc=8196 pt=72
+free before fork 56775, after wait 56775 -> no leak
+
+=== invalid accesses ===
+-- child touches address beyond sz (0x2007000) --
+pid 10 lazytest: page fault at 0x2007000 is beyond sz 0x2004000
+pid 10 lazytest: trap 14 err 6 on cpu 0 eip 0x512 addr 0x2007000--kill proc
+child killed, parent still alive
+
+-- child touches stack guard page (0x2000) --
+pid 11 lazytest: page fault at 0x2000 is below the heap (code/data/guard/stack)
+pid 11 lazytest: trap 14 err 7 on cpu 0 eip 0x512 addr 0x2000--kill proc
+child killed, parent still alive
+
+-- child touches kernel address (0x80100000) --
+pid 12 lazytest: page fault at 0x80100000 is beyond sz 0x2004000
+pid 12 lazytest: trap 14 err 7 on cpu 0 eip 0x512 addr 0x80100000--kill proc
+child killed, parent still alive
+
+-- child sbrk's 400 MB and touches every page (out of memory) --
+pid 13 lazytest: out of memory at 0xfd40000
+pid 13 lazytest: trap 14 err 6 on cpu 0 eip 0x3a0 addr 0xfd40000--kill proc
+child killed, parent alive. free before 56775, after 56775 -> no leak
+
+=== shrinking the lazy heap ===
+after sbrk(-32 MB): free=56782 proc=4 pt=72
+free at start 56788, now 56782 (page tables are kept until exit)
