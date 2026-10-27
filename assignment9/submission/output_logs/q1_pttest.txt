@@ -1,0 +1,20 @@
+$ make qemu-nox CPUS=1
+...
+$ pttest
+=== page table at start-up ===
+VA          PA          FLAGS
+0x0  0xdee8000  PWU
+0x1000  0xdee6000  PW-
+0x2000  0xdee5000  PWU
+valid user pages: 2, page-table pages: 2
+
+=== after sbrk(4 * 4096), new region 0x3000 - 0x7000 ===
+VA          PA          FLAGS
+0x0  0xdee8000  PWU
+0x1000  0xdee6000  PW-
+0x2000  0xdee5000  PWU
+0x3000  0xdfbc000  PWU
+0x4000  0xdf76000  PWU
+0x5000  0xdfbf000  PWU
+0x6000  0xdfc0000  PWU
+valid user pages: 6, page-table pages: 2

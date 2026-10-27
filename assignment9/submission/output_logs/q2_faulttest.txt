@@ -1,0 +1,128 @@
+$ make qemu-nox CPUS=1
+...
+$ faulttest
+faults at start: 0
+sbrk(32 * 4096) -> 0x3000, faults after sbrk: 0
+wrote page 0 (addr 0x3000), faults = 1
+wrote page 7 (addr 0xA000), faults = 2
+wrote page 15 (addr 0x12000), faults = 3
+wrote page 23 (addr 0x1A000), faults = 4
+wrote page 31 (addr 0x22000), faults = 5
+rewrote 2 already-touched pages, faults = 5
+page faults handled: 5 (expected 5)
+child 4: writing above sz at 0x24000
+pid 4 faulttest: invalid page fault at addr 0x24000 (sz 0x23000)--kill proc
+parent 3: child was killed, parent still alive, faults = 5
+$ usertests
+usertests starting
+arg test passed
+createdelete test
+createdelete ok
+linkunlink test
+linkunlink ok
+concreate test
+concreate ok
+fourfiles test
+fourfiles ok
+sharedfd test
+sharedfd ok
+bigarg test
+bigarg test ok
+bigwrite test
+bigwrite ok
+bigarg test
+bigarg test ok
+bss test
+bss test ok
+sbrk test
+pid 99 usertests: invalid page fault at addr 0x80000000 (sz 0xd000)--kill proc
+pid 100 usertests: invalid page fault at addr 0x8000c350 (sz 0xd000)--kill proc
+pid 101 usertests: invalid page fault at addr 0x800186a0 (sz 0xd000)--kill proc
+pid 102 usertests: invalid page fault at addr 0x800249f0 (sz 0xd000)--kill proc
+pid 103 usertests: invalid page fault at addr 0x80030d40 (sz 0xd000)--kill proc
+pid 104 usertests: invalid page fault at addr 0x8003d090 (sz 0xd000)--kill proc
+pid 105 usertests: invalid page fault at addr 0x800493e0 (sz 0xd000)--kill proc
+pid 106 usertests: invalid page fault at addr 0x80055730 (sz 0xd000)--kill proc
+pid 107 usertests: invalid page fault at addr 0x80061a80 (sz 0xd000)--kill proc
+pid 108 usertests: invalid page fault at addr 0x8006ddd0 (sz 0xd000)--kill proc
+pid 109 usertests: invalid page fault at addr 0x8007a120 (sz 0xd000)--kill proc
+pid 110 usertests: invalid page fault at addr 0x80086470 (sz 0xd000)--kill proc
+pid 111 usertests: invalid page fault at addr 0x800927c0 (sz 0xd000)--kill proc
+pid 112 usertests: invalid page fault at addr 0x8009eb10 (sz 0xd000)--kill proc
+pid 113 usertests: invalid page fault at addr 0x800aae60 (sz 0xd000)--kill proc
+pid 114 usertests: invalid page fault at addr 0x800b71b0 (sz 0xd000)--kill proc
+pid 115 usertests: invalid page fault at addr 0x800c3500 (sz 0xd000)--kill proc
+pid 116 usertests: invalid page fault at addr 0x800cf850 (sz 0xd000)--kill proc
+pid 117 usertests: invalid page fault at addr 0x800dbba0 (sz 0xd000)--kill proc
+pid 118 usertests: invalid page fault at addr 0x800e7ef0 (sz 0xd000)--kill proc
+pid 119 usertests: invalid page fault at addr 0x800f4240 (sz 0xd000)--kill proc
+pid 120 usertests: invalid page fault at addr 0x80100590 (sz 0xd000)--kill proc
+pid 121 usertests: invalid page fault at addr 0x8010c8e0 (sz 0xd000)--kill proc
+pid 122 usertests: invalid page fault at addr 0x80118c30 (sz 0xd000)--kill proc
+pid 123 usertests: invalid page fault at addr 0x80124f80 (sz 0xd000)--kill proc
+pid 124 usertests: invalid page fault at addr 0x801312d0 (sz 0xd000)--kill proc
+pid 125 usertests: invalid page fault at addr 0x8013d620 (sz 0xd000)--kill proc
+pid 126 usertests: invalid page fault at addr 0x80149970 (sz 0xd000)--kill proc
+pid 127 usertests: invalid page fault at addr 0x80155cc0 (sz 0xd000)--kill proc
+pid 128 usertests: invalid page fault at addr 0x80162010 (sz 0xd000)--kill proc
+pid 129 usertests: invalid page fault at addr 0x8016e360 (sz 0xd000)--kill proc
+pid 130 usertests: invalid page fault at addr 0x8017a6b0 (sz 0xd000)--kill proc
+pid 131 usertests: invalid page fault at addr 0x80186a00 (sz 0xd000)--kill proc
+pid 132 usertests: invalid page fault at addr 0x80192d50 (sz 0xd000)--kill proc
+pid 133 usertests: invalid page fault at addr 0x8019f0a0 (sz 0xd000)--kill proc
+pid 134 usertests: invalid page fault at addr 0x801ab3f0 (sz 0xd000)--kill proc
+pid 135 usertests: invalid page fault at addr 0x801b7740 (sz 0xd000)--kill proc
+pid 136 usertests: invalid page fault at addr 0x801c3a90 (sz 0xd000)--kill proc
+pid 137 usertests: invalid page fault at addr 0x801cfde0 (sz 0xd000)--kill proc
+pid 138 usertests: invalid page fault at addr 0x801dc130 (sz 0xd000)--kill proc
+sbrk test OK
+validate test
+validate ok
+open test
+open test ok
+small file test
+creat small succeeded; ok
+writes ok
+open small succeeded ok
+read succeeded ok
+small file test ok
+big files test
+big files ok
+many creates, followed by unlink test
+many creates, followed by unlink; ok
+openiput test
+openiput test ok
+exitiput test
+exitiput test ok
+iput test
+iput test ok
+mem test
+pid 427 usertests: invalid page fault at addr 0x24d1d004 (sz 0x24d25000)--kill proc
+pipe1 ok
+preempt: kill... wait... preempt ok
+exitwait ok
+rmdot test
+rmdot ok
+fourteen test
+fourteen ok
+bigfile test
+bigfile test ok
+subdir test
+subdir ok
+linktest
+linktest ok
+unlinkread test
+unlinkread ok
+dir vs file
+dir vs file OK
+empty file name
+empty file name OK
+fork test
+fork test OK
+bigdir test
+bigdir ok
+uio test
+pid 593 usertests: trap 13 err 0 on cpu 0 eip 0x35e3 addr 0x24d1d004--kill proc
+uio test done
+exec test
+ALL TESTS PASSED

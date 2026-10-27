@@ -1,0 +1,87 @@
+$ make qemu-nox CPUS=2
+...
+$ pttest
+=== page table at start-up ===
+VA          PA          FLAGS
+0x0  0xdee8000  PWU
+0x1000  0xdee6000  PW-
+0x2000  0xdee5000  PWU
+valid user pages: 2, page-table pages: 2
+
+=== after sbrk(4 * 4096), new region 0x3000 - 0x7000 ===
+VA          PA          FLAGS
+0x0  0xdee8000  PWU
+0x1000  0xdee6000  PW-
+0x2000  0xdee5000  PWU
+0x3000  0xdfbc000  PWU
+0x4000  0xdf76000  PWU
+0x5000  0xdfbf000  PWU
+0x6000  0xdfc0000  PWU
+valid user pages: 6, page-table pages: 2
+$ faulttest
+faults at start: 0
+sbrk(32 * 4096) -> 0x3000, faults after sbrk: 0
+wrote page 0 (addr 0x3000), faults = 1
+wrote page 7 (addr 0xA000), faults = 2
+wrote page 15 (addr 0x12000), faults = 3
+wrote page 23 (addr 0x1A000), faults = 4
+wrote page 31 (addr 0x22000), faults = 5
+rewrote 2 already-touched pages, faults = 5
+page faults handled: 5 (expected 5)
+child 5: writing above sz at 0x24000
+pid 5 faulttest: invalid page fault at addr 0x24000 (sz 0x23000)--kill proc
+parent 4: child was killed, parent still alive, faults = 5
+$ pagerepl
+reference string (20 refs): 7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1
+
+--- FIFO, 3 frames ---
+ref 7 :  7  -  -   FAULT
+ref 0 :  7  0  -   FAULT
+ref 1 :  7  0  1   FAULT
+ref 2 :  2  0  1   FAULT
+ref 0 :  2  0  1   hit
+ref 3 :  2  3  1   FAULT
+ref 0 :  2  3  0   FAULT
+ref 4 :  4  3  0   FAULT
+ref 2 :  4  2  0   FAULT
+ref 3 :  4  2  3   FAULT
+ref 0 :  0  2  3   FAULT
+ref 3 :  0  2  3   hit
+ref 2 :  0  2  3   hit
+ref 1 :  0  1  3   FAULT
+ref 2 :  0  1  2   FAULT
+ref 0 :  0  1  2   hit
+ref 1 :  0  1  2   hit
+ref 7 :  7  1  2   FAULT
+ref 0 :  7  0  2   FAULT
+ref 1 :  7  0  1   FAULT
+FIFO total page faults: 15
+
+--- LRU, 3 frames ---
+ref 7 :  7  -  -   FAULT
+ref 0 :  7  0  -   FAULT
+ref 1 :  7  0  1   FAULT
+ref 2 :  2  0  1   FAULT
+ref 0 :  2  0  1   hit
+ref 3 :  2  0  3   FAULT
+ref 0 :  2  0  3   hit
+ref 4 :  4  0  3   FAULT
+ref 2 :  4  0  2   FAULT
+ref 3 :  4  3  2   FAULT
+ref 0 :  0  3  2   FAULT
+ref 3 :  0  3  2   hit
+ref 2 :  0  3  2   hit
+ref 1 :  1  3  2   FAULT
+ref 2 :  1  3  2   hit
+ref 0 :  1  0  2   FAULT
+ref 1 :  1  0  2   hit
+ref 7 :  1  0  7   FAULT
+ref 0 :  1  0  7   hit
+ref 1 :  1  0  7   hit
+LRU total page faults: 12
+
+frames | FIFO faults | FIFO hit ratio | LRU faults | LRU hit ratio
+-------+-------------+----------------+------------+--------------
+   3   |     15      |     25.00%     |     12     |    40.00%
+   4   |     10      |     50.00%     |      8     |    60.00%
+   5   |      9      |     55.00%     |      7     |    65.00%
